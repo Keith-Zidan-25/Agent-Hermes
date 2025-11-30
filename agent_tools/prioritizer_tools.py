@@ -11,9 +11,9 @@ def calculate_and_rank_issues(classified_data_json: str, weights_json: str) -> s
 
     Args:
         classified_data_json (str): A JSON string containing a list of dictionaries 
-                                    from the Classifier Agent. Must include 'Issue_Type' 
+                                    from the Classifier Agent. Must include 'issue_Type' 
                                     and 'severity_score'.
-                                    Example: [{'Issue_Type': 'Pothole', 'severity_score': -0.4, 'frequency_count': 500}, ...]
+                                    Example: [{'issue_Type': 'Pothole', 'severity_score': -0.4, 'frequency_count': 500}, ...]
         weights_json (str): A JSON string defining the policy weights for each metric.
                             Weights must sum to a constant (e.g., 1.0 or 100) and must 
                             include keys for: 'Severity_Weight' and 'Frequency_Weight'.
@@ -28,9 +28,9 @@ def calculate_and_rank_issues(classified_data_json: str, weights_json: str) -> s
     df = pd.DataFrame(json.loads(classified_data_json))
     weights = json.loads(weights_json)
     
-    frequency_df = df.groupby('Issue_Type').size().reset_index(name='Total_Frequency')
-    severity_agg_df = df.groupby('Issue_Type')['severity_score'].mean().reset_index(name='Average_Severity_Score')
-    final_df = pd.merge(frequency_df, severity_agg_df, on='Issue_Type')
+    frequency_df = df.groupby('issue_Type').size().reset_index(name='Total_Frequency')
+    severity_agg_df = df.groupby('issue_Type')['severity_score'].mean().reset_index(name='Average_Severity_Score')
+    final_df = pd.merge(frequency_df, severity_agg_df, on='issue_Type')
     
     max_freq = final_df['Total_Frequency'].max()
     final_df['Norm_Frequency'] = final_df['Total_Frequency'] / max_freq
@@ -42,4 +42,4 @@ def calculate_and_rank_issues(classified_data_json: str, weights_json: str) -> s
     )
     
     df_ranked = final_df.sort_values(by='Priority_Score', ascending=False)
-    return df_ranked[['Issue_Type', 'Total_Frequency', 'Average_Severity_Score', 'Priority_Score']].to_json(orient='records')
+    return df_ranked[['issue_Type', 'Total_Frequency', 'Average_Severity_Score', 'Priority_Score']].to_json(orient='records')

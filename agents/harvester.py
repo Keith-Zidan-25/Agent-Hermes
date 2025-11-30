@@ -2,7 +2,7 @@ from google.adk import Agent
 from agent_tools.harvestor_tools import search_local_news
 
 harvesterAgent = Agent(
-    name="Harvester Agent",
+    name="Harvester",
     description="Gathers raw, current data from public web sources (news, social media) about local issues using the search_local_news tool, and extracts the total result count for frequency scoring.",
     model="gemini-2.5-flash",
     instruction="""
