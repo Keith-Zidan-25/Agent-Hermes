@@ -1,3 +1,9 @@
+# cache files
 */__pycache__
-.env*
 __pycache__
+
+# environment files
+.env*
+
+# log files
+*.log

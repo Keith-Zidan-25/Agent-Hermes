@@ -1,9 +1,12 @@
-import os
+import os, sys
 import dotenv
-from typing import Dict, Any
+import logging
 
+from typing import Dict, Any
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
+
+from google.adk.plugins import LoggingPlugin
 from google.adk.agents import SequentialAgent, Agent
 from google.adk.runners import InMemoryRunner
 
@@ -16,9 +19,34 @@ dotenv.load_dotenv(dotenv_path="./.env.local")
 API_KEY = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
 
 if not API_KEY:
-    # Raise an error if the key is missing before starting the app
-    raise ValueError("API Key not found. Please set GEMINI_API_KEY or GOOGLE_API_KEY in your .env file.")
+    raise ValueError("API Key not found")
 
+LOG_FILE = "agent_workflow.log"
+
+def setup_dual_logging(log_file: str, log_level=logging.DEBUG):
+    """Configures logging to output to both console and a file."""
+    
+    logging.getLogger().handlers.clear()
+    formatter = logging.Formatter(
+        '%(asctime)s - %(levelname)s - %(name)s - %(message)s'
+    )
+
+    file_handler = logging.FileHandler(log_file, mode='w')
+    file_handler.setLevel(log_level)
+    file_handler.setFormatter(formatter)
+
+    console_handler = logging.StreamHandler(sys.stdout)
+    console_handler.setLevel(log_level)
+    console_handler.setFormatter(formatter)
+
+    root_logger = logging.getLogger()
+    root_logger.setLevel(log_level)
+    root_logger.addHandler(file_handler)
+    root_logger.addHandler(console_handler)
+
+    print(f"Logging configured with output to {LOG_FILE} + console")
+
+setup_dual_logging(LOG_FILE)
 
 localIssueAnalyser = SequentialAgent(
     name="Local_Issue_Analyser",
@@ -46,13 +74,18 @@ async def analyze_local_issues(request: AnalysisRequest):
         raise HTTPException(status_code=400, detail="Prompt cannot be empty.")
 
     try:
-        runner = InMemoryRunner(agent=localIssueAnalyser)
-        final_report = await runner.run_debug(prompt)
+        logger = LoggingPlugin(name="agent_logger")
+        runner = InMemoryRunner(agent=localIssueAnalyser, plugins=[logger])
+        agent_output = await runner.run_debug(prompt)
+        
+        final_report = agent_output[7]
+        text_summary = agent_output[8]
         
         return {
             "status": "success",
             "prompt": prompt,
-            "report": final_report
+            "report": final_report,
+            "summary": text_summary
         }
 
     except Exception as e:
