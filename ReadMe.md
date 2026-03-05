@@ -42,5 +42,24 @@ The sequential flow involves three distinct sub-agents:
 
 > Logic and Output: It analyzes the frequency, severity, and urgency implied in the reports for each unique issue. It then assigns a quantitative priority score (e.g., 1-10) to each item. Crucially, it converts its final findings into a highly reliable JSON format, which serves as the final, ranked structured report. The final output visible to the user is the human-readable summary of this JSON report, provided by the Sequential Agent itself.
 
+### Running the Agent
+
+1. Install python packages
+```bash
+$ pip install -r requirements.txt
+```
+
+2. Set env variables
+```
+SERPER_API_KEY= XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+GOOGLE_API_KEY= gemini-api-key-from-google-ai-studio
+SERPER_URL= get-from-serper-website
+```
+
+3. Run app.py
+```bash
+$ uvicorn app:app --reload
+```
+
 ### Conclusion
 The Local Issue Analyser represents a modern, robust application of the Gemini ADK for civic technology. By combining specialized agents within a sequential pipeline, it transforms chaotic public feedback into actionable, objective, and prioritized intelligence. This efficient shift from manual triage to automated, structured reporting empowers local authorities to improve resource management and respond more effectively to the most pressing needs of their communities.
