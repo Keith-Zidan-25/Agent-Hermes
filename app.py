@@ -27,9 +27,7 @@ def setup_dual_logging(log_file: str, log_level=logging.DEBUG):
     """Configures logging to output to both console and a file."""
     
     logging.getLogger().handlers.clear()
-    formatter = logging.Formatter(
-        '%(asctime)s - %(levelname)s - %(name)s - %(message)s'
-    )
+    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(name)s - %(message)s')
 
     file_handler = logging.FileHandler(log_file, mode='w')
     file_handler.setLevel(log_level)
