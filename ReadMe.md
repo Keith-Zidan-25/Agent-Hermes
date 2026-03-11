@@ -58,7 +58,7 @@ SERPER_URL= get-from-serper-website
 
 3. Run app.py
 ```bash
-$ uvicorn app:app --reload
+$ uvicorn app:app
 ```
 
 ### Conclusion
